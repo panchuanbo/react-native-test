@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {StyleSheet, View, TouchableHighlight, FlatList} from 'react-native';
 
@@ -34,7 +26,8 @@ class HomeView extends React.Component {
   };
 
   onPress = () => {
-    alert(`Test`);
+    const {navigate} = this.props.navigation;
+    navigate('EmployeeDetailView');
   };
 
   render() {
