@@ -8,8 +8,25 @@ const kData = [
     id: '123',
     firstname: 'Jon',
     lastname: 'Garret',
-    skills: [],
-    address: [],
+    skills: [
+      {
+        id: 'abc',
+        name: 'painter',
+      },
+      {
+        id: 'efg',
+        name: 'drawer',
+      },
+    ],
+    address: [
+      {
+        line1: '123 Magic Way',
+        line2: null,
+        city: 'Magic',
+        state: 'Land',
+        zipcode: '123456',
+      },
+    ],
   },
   {
     id: '456',
@@ -25,9 +42,9 @@ class HomeView extends React.Component {
     title: 'Home',
   };
 
-  onPress = () => {
+  onCellPress = employee => {
     const {navigate} = this.props.navigation;
-    navigate('EmployeeDetailView');
+    navigate('EmployeeDetailView', {employee: employee});
   };
 
   render() {
@@ -41,7 +58,7 @@ class HomeView extends React.Component {
               <TouchableHighlight
                 style={styles.highlightStyle}
                 underlayColor="lightgray"
-                onPress={this.onPress}>
+                onPress={() => this.onCellPress(item)}>
                 <BasicCell
                   mainText={`${item.firstname} ${item.lastname}`}
                   subText={`ID: ${item.id}`}
