@@ -7,41 +7,10 @@ import {
   Button,
 } from 'react-native';
 
-import BasicCell from '../Components/BasicCell.js';
+import {withApollo} from 'react-apollo';
 
-const kData = [
-  {
-    id: '123',
-    firstname: 'Jon',
-    lastname: 'Garret',
-    skills: [
-      {
-        id: 'abc',
-        name: 'painter',
-      },
-      {
-        id: 'efg',
-        name: 'drawer',
-      },
-    ],
-    address: [
-      {
-        line1: '123 Magic Way',
-        line2: null,
-        city: 'Magic',
-        state: 'Land',
-        zipcode: '123456',
-      },
-    ],
-  },
-  {
-    id: '456',
-    firstname: 'Jon',
-    lastname: 'Garret2',
-    skills: [],
-    address: [],
-  },
-];
+import ListEmployees from '../Queries/ListEmployees';
+import BasicCell from '../Components/BasicCell.js';
 
 class HomeView extends React.Component {
   static navigationOptions = ({navigation}) => ({
@@ -56,22 +25,45 @@ class HomeView extends React.Component {
     ),
   });
 
+  setupData = async () => {
+    const result = await this.props.client.query({
+      query: ListEmployees,
+    });
+
+    this.setState({data: result.data.employeeList.items});
+  };
+
+  getData = () => {
+    if (!this.state) {
+      return [];
+    }
+    if (!this.state.data) {
+      return [];
+    }
+
+    return this.state.data;
+  };
+
   onAddEmployeePress = () => {
     const {navigate} = this.props.navigation;
     navigate('FormView', {formType: 'employee'});
   };
 
-  onCellPress = employee => {
+  onCellPress = async employee => {
     const {navigate} = this.props.navigation;
     navigate('EmployeeDetailView', {employee: employee});
   };
+
+  componentDidMount() {
+    this.setupData();
+  }
 
   render() {
     return (
       <View style={styles.container}>
         <FlatList
           style={styles.flatview}
-          data={kData}
+          data={this.getData()}
           renderItem={({item}) => {
             return (
               <TouchableHighlight
@@ -111,4 +103,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeView;
+export default withApollo(HomeView);

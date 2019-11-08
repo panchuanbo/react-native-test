@@ -18,13 +18,23 @@ class EmployeeDetailView extends React.Component {
   };
 
   onEntryPress = (formType, formData) => {
+    const employee = this.props.navigation.getParam('employee', null);
     const {navigate} = this.props.navigation;
-    navigate('FormView', {formType: formType, formData: formData});
+    navigate('FormView', {
+      formType: formType,
+      formData: formData,
+      employeeId: employee.id,
+    });
   };
 
   onAddPress = formType => {
+    const employee = this.props.navigation.getParam('employee', null);
     const {navigate} = this.props.navigation;
-    navigate('FormView', {formType: formType, status: 'new'});
+    navigate('FormView', {
+      formType: formType,
+      status: 'new',
+      employeeId: employee.id,
+    });
   };
 
   render() {
@@ -49,7 +59,7 @@ class EmployeeDetailView extends React.Component {
         ))}
         <ListItem
           key="skill-add"
-          title="Add Skill"
+          title="+ Add Skill"
           onPress={() => this.onAddPress('skill')}
         />
         <Divider style={styles.sectionDivider} />
