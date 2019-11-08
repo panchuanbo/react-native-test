@@ -8,16 +8,21 @@ import EmployeeInput from '../Components/EmployeeInput';
 import AddressInput from '../Components/AddressInput';
 import SkillInput from '../Components/SkillInput';
 
+import {performMutation} from '../Queries/Operations';
+
 import ListEmployee from '../Queries/ListEmployees';
 
 import AddEmployee from '../Queries/AddEmployee';
 import EditEmployee from '../Queries/EditEmployee';
+import DeleteEmployee from '../Queries/DeleteEmployee';
 
 import AddAddress from '../Queries/AddAddress';
 import EditAddress from '../Queries/EditAddress';
+import DeleteAddress from '../Queries/DeleteAddress';
 
 import AddSkill from '../Queries/AddSkill';
 import EditSkill from '../Queries/EditSkill';
+import DeleteSkill from '../Queries/DeleteSkill';
 
 class FormView extends React.Component {
   static navigationOptions = {
@@ -78,46 +83,6 @@ class FormView extends React.Component {
     }
   };
 
-  validateInputs = inputs => {
-    if (!inputs) {
-      return false;
-    }
-
-    let keys = Object.keys(inputs);
-    for (let i = 0; i < keys.length; i++) {
-      if (!inputs[keys[i]]) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  performMutation = async (mutation, variables) => {
-    if (this.validateInputs(variables)) {
-      try {
-        let data = await this.props.client.mutate({
-          mutation: mutation,
-          variables: variables,
-          options: {
-            refetchQueries: [{query: ListEmployee}],
-          },
-        });
-        console.warn(data);
-        this.props.navigation.goBack();
-      } catch (e) {
-        // eslint-disable-next-line no-alert
-        alert('The Request Failed. Please make sure all inputs are valid.');
-        console.warn(e);
-        console.warn(variables);
-      }
-    } else {
-      // eslint-disable-next-line no-alert
-      alert('Invalid Inputs. Please check again.');
-      console.warn(variables);
-    }
-  };
-
   saveData = () => {
     const formType = this.props.navigation.getParam('formType', null);
     const status = this.props.navigation.getParam('status', 'edit');
@@ -128,9 +93,9 @@ class FormView extends React.Component {
     let {inputs} = this.state;
     if (formType === 'employee') {
       if (status === 'new') {
-        this.performMutation(AddEmployee, inputs);
+        performMutation(this, AddEmployee, inputs);
       } else if (status === 'edit') {
-        this.performMutation(EditEmployee, {
+        performMutation(this, EditEmployee, {
           id: employeeId,
           employee: {
             firstname: inputs.firstname || data.firstname,
@@ -140,7 +105,7 @@ class FormView extends React.Component {
       }
     } else if (formType === 'address') {
       if (status === 'new') {
-        this.performMutation(AddAddress, {
+        performMutation(this, AddAddress, {
           id: employeeId,
           address: inputs,
         });
@@ -151,7 +116,7 @@ class FormView extends React.Component {
         newAddr.state = newAddr.state || data.state;
         newAddr.zipcode = newAddr.zipcode || data.zipcode;
 
-        this.performMutation(EditAddress, {
+        performMutation(this, EditAddress, {
           id: employeeId,
           oldAddr: data,
           newAddr: newAddr,
@@ -159,12 +124,12 @@ class FormView extends React.Component {
       }
     } else if (formType === 'skill') {
       if (status === 'new') {
-        this.performMutation(AddSkill, {
+        performMutation(this, AddSkill, {
           id: employeeId,
           skill: inputs,
         });
       } else if (status === 'edit') {
-        this.performMutation(EditSkill, {
+        performMutation(this, EditSkill, {
           id: employeeId,
           skillId: data.id,
           skill: {
@@ -173,6 +138,21 @@ class FormView extends React.Component {
           },
         });
       }
+    }
+  };
+
+  deleteData = () => {
+    const formType = this.props.navigation.getParam('formType', null);
+    const employeeId = this.props.navigation.getParam('employeeId', null);
+    let data = this.props.navigation.getParam('formData', {});
+    delete data.__typename;
+
+    if (formType === 'employee') {
+      performMutation(this, DeleteEmployee, {id: employeeId});
+    } else if (formType === 'skill') {
+      performMutation(this, DeleteSkill, {id: employeeId, skillId: data.id});
+    } else if (formType === 'address') {
+      performMutation(this, DeleteAddress, {id: employeeId, address: data});
     }
   };
 

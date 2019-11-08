@@ -1,16 +1,41 @@
-import {graphql} from 'react-apollo';
-
 import ListEmployees from './ListEmployees';
 
-const Operations = {
-  ListEmployees: graphql(ListEmployees, {
-    options: {
-      fetchPolicy: 'network-only',
-    },
-    props: ({data}) => {
-      return {loading: data.loading, employeeList: data.employeeList};
-    },
-  }),
+export const validateInputs = inputs => {
+  if (!inputs || inputs === {}) {
+    return false;
+  }
+
+  let keys = Object.keys(inputs);
+  for (let i = 0; i < keys.length; i++) {
+    let obj = inputs[keys[i]];
+    if (!obj) {
+      return false;
+    }
+    if (typeof obj === 'object' && Object.keys(obj).length === 0) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
-export default Operations;
+export const performMutation = async (obj, mutation, variables) => {
+  if (validateInputs(variables)) {
+    try {
+      let data = await obj.props.client.mutate({
+        mutation: mutation,
+        variables: variables,
+        options: {
+          refetchQueries: [{query: ListEmployees}],
+        },
+      });
+      obj.props.navigation.goBack();
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert('The Request Failed. Please make sure all inputs are valid.');
+    }
+  } else {
+    // eslint-disable-next-line no-alert
+    alert('Invalid Inputs. Please check again.');
+  }
+};

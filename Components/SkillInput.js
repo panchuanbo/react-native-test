@@ -8,6 +8,15 @@ class SkillInput extends React.Component {
     super();
     this.state = {id: null, name: null};
   }
+
+  componentDidMount() {
+    const {data} = this.props;
+    if (data) {
+      this.state = data;
+    }
+    this.onSubmit();
+  }
+
   onSubmit = () => {
     const {callback} = this.props;
     callback(this.state);

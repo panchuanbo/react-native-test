@@ -14,6 +14,14 @@ class AddressInput extends React.Component {
     };
   }
 
+  componentDidMount() {
+    const {data} = this.props;
+    if (data) {
+      this.state = data;
+    }
+    this.onSubmit();
+  }
+
   onSubmit = () => {
     const {callback} = this.props;
     if (this.state.line2 === null) {

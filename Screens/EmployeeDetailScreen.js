@@ -2,8 +2,12 @@ import React from 'react';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {ListItem, Divider} from 'react-native-elements';
 import {Button} from 'react-native-material-ui';
+import {withApollo} from 'react-apollo';
 
 import SectionHeader from '../Components/SectionHeader.js';
+
+import {performMutation} from '../Queries/Operations';
+import DeleteEmployee from '../Queries/DeleteEmployee';
 
 class EmployeeDetailView extends React.Component {
   static navigationOptions = {
@@ -35,6 +39,11 @@ class EmployeeDetailView extends React.Component {
       status: 'new',
       employeeId: employee.id,
     });
+  };
+
+  deleteEmployee = () => {
+    const employee = this.props.navigation.getParam('employee', null);
+    performMutation(this, DeleteEmployee, {id: employee.id});
   };
 
   render() {
@@ -80,6 +89,7 @@ class EmployeeDetailView extends React.Component {
         <Divider style={styles.largeDivider} />
         <Button
           style={styles.deleteStyle}
+          onPress={this.deleteEmployee}
           raised
           accent
           text="Delete Employee"
@@ -110,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmployeeDetailView;
+export default withApollo(EmployeeDetailView);
