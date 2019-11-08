@@ -15,6 +15,9 @@ import EditEmployee from '../Queries/EditEmployee';
 
 import AddAddress from '../Queries/AddAddress';
 
+import AddSkill from '../Queries/AddSkill';
+import EditSkill from '../Queries/EditSkill';
+
 class FormView extends React.Component {
   static navigationOptions = {
     title: 'Edit Details',
@@ -31,13 +34,37 @@ class FormView extends React.Component {
 
     switch (formType) {
       case 'employee':
-        return <EmployeeInput data={data} status={status} callback={this.formCallback} />;
+        return (
+          <EmployeeInput
+            data={data}
+            status={status}
+            callback={this.formCallback}
+          />
+        );
       case 'address':
-        return <AddressInput data={data} status={status} callback={this.formCallback} />;
+        return (
+          <AddressInput
+            data={data}
+            status={status}
+            callback={this.formCallback}
+          />
+        );
       case 'skill':
-        return <SkillInput data={data} status={status} callback={this.formCallback} />;
+        return (
+          <SkillInput
+            data={data}
+            status={status}
+            callback={this.formCallback}
+          />
+        );
       default:
-        return <EmployeeInput data={data} status={status} callback={this.formCallback} />;
+        return (
+          <EmployeeInput
+            data={data}
+            status={status}
+            callback={this.formCallback}
+          />
+        );
     }
   };
 
@@ -68,13 +95,14 @@ class FormView extends React.Component {
   performMutation = async (mutation, variables) => {
     if (this.validateInputs(variables)) {
       try {
-        await this.props.client.mutate({
+        let data = await this.props.client.mutate({
           mutation: mutation,
           variables: variables,
           options: {
             refetchQueries: [{query: ListEmployee}],
           },
         });
+        console.warn(data);
         this.props.navigation.goBack();
       } catch (e) {
         // eslint-disable-next-line no-alert
@@ -113,6 +141,22 @@ class FormView extends React.Component {
         this.performMutation(AddAddress, {
           id: employeeId,
           address: inputs,
+        });
+      }
+    } else if (formType === 'skill') {
+      if (status === 'new') {
+        this.performMutation(AddSkill, {
+          id: employeeId,
+          skill: inputs,
+        });
+      } else if (status === 'edit') {
+        this.performMutation(EditSkill, {
+          id: employeeId,
+          skillId: data.id,
+          skill: {
+            id: inputs.id || data.id,
+            name: inputs.name || data.name,
+          },
         });
       }
     }
