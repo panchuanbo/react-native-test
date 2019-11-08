@@ -5,6 +5,7 @@ import {
   TouchableHighlight,
   FlatList,
   Button,
+  Image,
 } from 'react-native';
 
 import {withApollo} from 'react-apollo';
@@ -12,12 +13,16 @@ import {withApollo} from 'react-apollo';
 import ListEmployees from '../Queries/ListEmployees';
 import BasicCell from '../Components/BasicCell.js';
 
+const LogoPath = '../Resources/logo-name.png';
+
 class HomeView extends React.Component {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
 
     return {
-      title: 'Home',
+      headerTitle: (
+        <Image style={styles.titleStyle} source={require(LogoPath)} />
+      ),
       headerRight: () => (
         <Button
           onPress={() =>
@@ -141,6 +146,10 @@ const styles = StyleSheet.create({
   },
   highlightStyle: {
     backgroundColor: 'white',
+  },
+  titleStyle: {
+    width: 80,
+    height: 30,
   },
 });
 
