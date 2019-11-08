@@ -14,6 +14,7 @@ import AddEmployee from '../Queries/AddEmployee';
 import EditEmployee from '../Queries/EditEmployee';
 
 import AddAddress from '../Queries/AddAddress';
+import EditAddress from '../Queries/EditAddress';
 
 import AddSkill from '../Queries/AddSkill';
 import EditSkill from '../Queries/EditSkill';
@@ -73,7 +74,7 @@ class FormView extends React.Component {
     const status = this.props.navigation.getParam('status', 'edit');
 
     if (formType !== 'employee' && status === 'edit') {
-      return <Button raised accent text="Delete" />;
+      return <Button raised accent text="Delete" onPress={this.deleteData} />;
     }
   };
 
@@ -121,7 +122,8 @@ class FormView extends React.Component {
     const formType = this.props.navigation.getParam('formType', null);
     const status = this.props.navigation.getParam('status', 'edit');
     const employeeId = this.props.navigation.getParam('employeeId', null);
-    const data = this.props.navigation.getParam('formData', {});
+    let data = this.props.navigation.getParam('formData', {});
+    delete data.__typename;
 
     let {inputs} = this.state;
     if (formType === 'employee') {
@@ -141,6 +143,18 @@ class FormView extends React.Component {
         this.performMutation(AddAddress, {
           id: employeeId,
           address: inputs,
+        });
+      } else if (status === 'edit') {
+        let newAddr = inputs;
+        newAddr.line1 = newAddr.line1 || data.line1;
+        newAddr.city = newAddr.city || data.city;
+        newAddr.state = newAddr.state || data.state;
+        newAddr.zipcode = newAddr.zipcode || data.zipcode;
+
+        this.performMutation(EditAddress, {
+          id: employeeId,
+          oldAddr: data,
+          newAddr: newAddr,
         });
       }
     } else if (formType === 'skill') {
