@@ -7,11 +7,26 @@ import {withApollo} from 'react-apollo';
 import SectionHeader from '../Components/SectionHeader.js';
 
 import {performMutation} from '../Queries/Operations';
+import GetEmployee from '../Queries/GetEmployee';
 import DeleteEmployee from '../Queries/DeleteEmployee';
 
 class EmployeeDetailView extends React.Component {
   static navigationOptions = {
     title: 'Employee Details',
+  };
+
+  state = {
+    employee: this.props.navigation.getParam('employee', null),
+  };
+
+  refresh = async () => {
+    const {employee} = this.state;
+    const result = await this.props.client.query({
+      query: GetEmployee,
+      variables: {id: employee.id},
+    });
+
+    this.setState({employee: result.data.employee});
   };
 
   formatAddress = addr => {
@@ -22,32 +37,34 @@ class EmployeeDetailView extends React.Component {
   };
 
   onEntryPress = (formType, formData) => {
-    const employee = this.props.navigation.getParam('employee', null);
+    const {employee} = this.state;
     const {navigate} = this.props.navigation;
     navigate('FormView', {
+      employeeId: employee.id,
       formType: formType,
       formData: formData,
-      employeeId: employee.id,
+      refresh: this.refresh,
     });
   };
 
   onAddPress = formType => {
-    const employee = this.props.navigation.getParam('employee', null);
+    const {employee} = this.state;
     const {navigate} = this.props.navigation;
     navigate('FormView', {
-      formType: formType,
-      status: 'new',
       employeeId: employee.id,
+      formType: formType,
+      refresh: this.refresh,
+      status: 'new',
     });
   };
 
   deleteEmployee = () => {
-    const employee = this.props.navigation.getParam('employee', null);
+    const {employee} = this.state;
     performMutation(this, DeleteEmployee, {id: employee.id});
   };
 
   render() {
-    const employee = this.props.navigation.getParam('employee', null);
+    const {employee} = this.state;
 
     return employee ? (
       <ScrollView style={styles.scrollView}>

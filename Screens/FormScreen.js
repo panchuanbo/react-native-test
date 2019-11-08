@@ -10,8 +10,6 @@ import SkillInput from '../Components/SkillInput';
 
 import {performMutation} from '../Queries/Operations';
 
-import ListEmployee from '../Queries/ListEmployees';
-
 import AddEmployee from '../Queries/AddEmployee';
 import EditEmployee from '../Queries/EditEmployee';
 import DeleteEmployee from '../Queries/DeleteEmployee';
@@ -83,32 +81,35 @@ class FormView extends React.Component {
     }
   };
 
-  saveData = () => {
+  saveData = async () => {
     const formType = this.props.navigation.getParam('formType', null);
     const status = this.props.navigation.getParam('status', 'edit');
     const employeeId = this.props.navigation.getParam('employeeId', null);
+    const refresh = this.props.navigation.getParam('refresh', () => {});
     let data = this.props.navigation.getParam('formData', {});
     delete data.__typename;
 
     let {inputs} = this.state;
     if (formType === 'employee') {
       if (status === 'new') {
-        performMutation(this, AddEmployee, inputs);
+        data = (await performMutation(this, AddEmployee, inputs)) || data;
       } else if (status === 'edit') {
-        performMutation(this, EditEmployee, {
-          id: employeeId,
-          employee: {
-            firstname: inputs.firstname || data.firstname,
-            lastname: inputs.lastname || data.lastname,
-          },
-        });
+        data =
+          (await performMutation(this, EditEmployee, {
+            id: employeeId,
+            employee: {
+              firstname: inputs.firstname || data.firstname,
+              lastname: inputs.lastname || data.lastname,
+            },
+          })) || data;
       }
     } else if (formType === 'address') {
       if (status === 'new') {
-        performMutation(this, AddAddress, {
-          id: employeeId,
-          address: inputs,
-        });
+        data =
+          (await performMutation(this, AddAddress, {
+            id: employeeId,
+            address: inputs,
+          })) || data;
       } else if (status === 'edit') {
         let newAddr = inputs;
         newAddr.line1 = newAddr.line1 || data.line1;
@@ -116,44 +117,61 @@ class FormView extends React.Component {
         newAddr.state = newAddr.state || data.state;
         newAddr.zipcode = newAddr.zipcode || data.zipcode;
 
-        performMutation(this, EditAddress, {
-          id: employeeId,
-          oldAddr: data,
-          newAddr: newAddr,
-        });
+        data =
+          (await performMutation(this, EditAddress, {
+            id: employeeId,
+            oldAddr: data,
+            newAddr: newAddr,
+          })) || data;
       }
     } else if (formType === 'skill') {
       if (status === 'new') {
-        performMutation(this, AddSkill, {
-          id: employeeId,
-          skill: inputs,
-        });
+        data =
+          (await performMutation(this, AddSkill, {
+            id: employeeId,
+            skill: inputs,
+          })) || data;
       } else if (status === 'edit') {
-        performMutation(this, EditSkill, {
+        data = await performMutation(this, EditSkill, {
           id: employeeId,
           skillId: data.id,
-          skill: {
-            id: inputs.id || data.id,
-            name: inputs.name || data.name,
-          },
+          skill:
+            {
+              id: inputs.id || data.id,
+              name: inputs.name || data.name,
+            } || data,
         });
       }
     }
+
+    refresh(data);
   };
 
-  deleteData = () => {
+  deleteData = async () => {
     const formType = this.props.navigation.getParam('formType', null);
     const employeeId = this.props.navigation.getParam('employeeId', null);
+    const refresh = this.props.navigation.getParam('refresh', () => {});
     let data = this.props.navigation.getParam('formData', {});
     delete data.__typename;
 
     if (formType === 'employee') {
-      performMutation(this, DeleteEmployee, {id: employeeId});
+      data =
+        (await performMutation(this, DeleteEmployee, {id: employeeId})) || data;
     } else if (formType === 'skill') {
-      performMutation(this, DeleteSkill, {id: employeeId, skillId: data.id});
+      data =
+        (await performMutation(this, DeleteSkill, {
+          id: employeeId,
+          skillId: data.id,
+        })) || data;
     } else if (formType === 'address') {
-      performMutation(this, DeleteAddress, {id: employeeId, address: data});
+      data =
+        (await performMutation(this, DeleteAddress, {
+          id: employeeId,
+          address: data,
+        })) || data;
     }
+
+    refresh();
   };
 
   render() {

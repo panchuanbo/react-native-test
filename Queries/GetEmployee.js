@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
-const DeleteAddress = gql`
-  mutation DeleteAddress($id: String, $address: AddressInput) {
-    deleteEmployeeAddress(id: $id, address: $address) {
+const GetEmployee = gql`
+  query GetEmployee($id: String) {
+    employee(id: $id) {
       id
       firstname
       lastname
@@ -21,4 +21,4 @@ const DeleteAddress = gql`
   }
 `;
 
-export default DeleteAddress;
+export default GetEmployee;

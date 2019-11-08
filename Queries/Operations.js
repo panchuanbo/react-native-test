@@ -30,6 +30,7 @@ export const performMutation = async (obj, mutation, variables) => {
         },
       });
       obj.props.navigation.goBack();
+      return Object.values(data.data)[0];
     } catch (e) {
       // eslint-disable-next-line no-alert
       alert('The Request Failed. Please make sure all inputs are valid.');
