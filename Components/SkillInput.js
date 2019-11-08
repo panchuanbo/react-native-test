@@ -14,12 +14,15 @@ class SkillInput extends React.Component {
   };
 
   render() {
+    const {data} = this.props;
+
     return (
       <View>
         <TextField
           label="Skill"
           onSubmitEditing={this.onSubmit}
           onChangeText={this.onChangeSkill}
+          defaultValue={data.name}
         />
       </View>
     );

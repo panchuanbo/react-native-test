@@ -1,5 +1,7 @@
 import React from 'react';
-import {StyleSheet, ScrollView, Button} from 'react-native';
+import {StyleSheet, ScrollView} from 'react-native';
+import {ListItem, Divider} from 'react-native-elements';
+import {Button} from 'react-native-material-ui';
 
 import EmployeeInput from '../Components/EmployeeInput';
 import AddressInput from '../Components/AddressInput';
@@ -8,7 +10,6 @@ import SkillInput from '../Components/SkillInput';
 class FormView extends React.Component {
   static navigationOptions = {
     title: 'Edit Details',
-    headerRight: () => <Button onPress={() => {}} title="✓" />,
   };
 
   formCallback = inputs => {
@@ -31,9 +32,24 @@ class FormView extends React.Component {
     }
   };
 
+  getDeleteButton = () => {
+    const formType = this.props.navigation.getParam('formType', null);
+    const status = this.props.navigation.getParam('status', 'edit');
+
+    if (formType !== 'employee' && status === 'edit') {
+      return <Button raised accent text="Delete" />;
+    }
+  };
+
   render() {
     return (
-      <ScrollView style={styles.scrollView}>{this.getFormType()}</ScrollView>
+      <ScrollView style={styles.scrollView}>
+        {this.getFormType()}
+        <Divider style={styles.largeDivider} />
+        <Button raised primary text="Save" />
+        <Divider style={styles.divider} />
+        {this.getDeleteButton()}
+      </ScrollView>
     );
   }
 }
@@ -45,9 +61,16 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
   },
-  sectionDivider: {
-    backgroundColor: '#f0f0f0',
+  divider: {
+    backgroundColor: '#fafafa',
     height: 16,
+  },
+  largeDivider: {
+    backgroundColor: '#fafafa',
+    height: 32,
+  },
+  deleteStyle: {
+    color: 'red',
   },
 });
 

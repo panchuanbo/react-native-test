@@ -194,7 +194,6 @@
 				9FAA179400CB36F37AE12DA1 /* Pods-BuildOpsTestProjectTests.debug.xcconfig */,
 				06131CC5C1F01D471E972CE6 /* Pods-BuildOpsTestProjectTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};

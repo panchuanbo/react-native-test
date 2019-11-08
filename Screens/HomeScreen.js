@@ -1,5 +1,11 @@
 import React from 'react';
-import {StyleSheet, View, TouchableHighlight, FlatList} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TouchableHighlight,
+  FlatList,
+  Button,
+} from 'react-native';
 
 import BasicCell from '../Components/BasicCell.js';
 
@@ -38,8 +44,21 @@ const kData = [
 ];
 
 class HomeView extends React.Component {
-  static navigationOptions = {
+  static navigationOptions = ({navigation}) => ({
     title: 'Home',
+    headerRight: () => (
+      <Button
+        onPress={() =>
+          navigation.navigate('FormView', {formType: 'employee', status: 'new'})
+        }
+        title="Add"
+      />
+    ),
+  });
+
+  onAddEmployeePress = () => {
+    const {navigate} = this.props.navigation;
+    navigate('FormView', {formType: 'employee'});
   };
 
   onCellPress = employee => {
