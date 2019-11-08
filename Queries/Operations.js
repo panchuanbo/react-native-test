@@ -34,9 +34,11 @@ export const performMutation = async (obj, mutation, variables) => {
     } catch (e) {
       // eslint-disable-next-line no-alert
       alert('The Request Failed. Please make sure all inputs are valid.');
+      return false;
     }
   } else {
     // eslint-disable-next-line no-alert
     alert('Invalid Inputs. Please check again.');
+    return false;
   }
 };

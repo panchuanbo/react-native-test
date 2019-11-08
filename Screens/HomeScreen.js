@@ -13,24 +13,34 @@ import ListEmployees from '../Queries/ListEmployees';
 import BasicCell from '../Components/BasicCell.js';
 
 class HomeView extends React.Component {
-  static navigationOptions = ({navigation}) => ({
-    title: 'Home',
-    headerRight: () => (
-      <Button
-        onPress={() =>
-          navigation.navigate('FormView', {formType: 'employee', status: 'new'})
-        }
-        title="Add"
-      />
-    ),
-  });
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+
+    return {
+      title: 'Home',
+      headerRight: () => (
+        <Button
+          onPress={() =>
+            navigation.navigate('FormView', {
+              formType: 'employee',
+              status: 'new',
+              refresh: params.onAdd,
+            })
+          }
+          title="Add"
+        />
+      ),
+    };
+  };
 
   setupData = async () => {
     const result = await this.props.client.query({
       query: ListEmployees,
     });
 
-    this.setState({data: result.data.employeeList.items});
+    let data = result.data.employeeList.items;
+    data.sort((e1, e2) => e1.id > e2.id);
+    this.setState({data: data});
   };
 
   getData = () => {
@@ -51,11 +61,42 @@ class HomeView extends React.Component {
 
   onCellPress = async employee => {
     const {navigate} = this.props.navigation;
-    navigate('EmployeeDetailView', {employee: employee});
+    navigate('EmployeeDetailView', {
+      employee: employee,
+      onDelete: this.onDelete,
+      onUpdate: this.onUpdate,
+    });
+  };
+
+  onDelete = id => {
+    let newData = this.getData().filter(e => e.id !== id);
+    this.setState({data: newData});
+  };
+
+  onAdd = employee => {
+    if (employee) {
+      employee.skills = [];
+      employee.address = [];
+      let newData = this.getData();
+      newData.push(employee);
+      newData.sort((e1, e2) => e1.id > e2.id);
+      this.setState({data: newData});
+    }
+  };
+
+  onUpdate = employee => {
+    let newData = this.getData()
+      .map(e => (e.id === employee.id ? employee : e))
+      .sort((e1, e2) => e1.id > e2.id);
+    this.setState({data: newData});
   };
 
   componentDidMount() {
+    const {navigation} = this.props;
     this.setupData();
+    navigation.setParams({
+      onAdd: this.onAdd,
+    });
   }
 
   render() {

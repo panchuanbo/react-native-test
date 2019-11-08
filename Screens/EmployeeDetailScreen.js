@@ -17,6 +17,8 @@ class EmployeeDetailView extends React.Component {
 
   state = {
     employee: this.props.navigation.getParam('employee', null),
+    onDelete: this.props.navigation.getParam('onDelete', () => {}),
+    onUpdate: this.props.navigation.getParam('onUpdate', () => {}),
   };
 
   refresh = async () => {
@@ -27,6 +29,7 @@ class EmployeeDetailView extends React.Component {
     });
 
     this.setState({employee: result.data.employee});
+    this.state.onUpdate(result.data.employee);
   };
 
   formatAddress = addr => {
@@ -58,9 +61,10 @@ class EmployeeDetailView extends React.Component {
     });
   };
 
-  deleteEmployee = () => {
-    const {employee} = this.state;
-    performMutation(this, DeleteEmployee, {id: employee.id});
+  deleteEmployee = async () => {
+    const {employee, onDelete} = this.state;
+    await performMutation(this, DeleteEmployee, {id: employee.id});
+    onDelete(employee.id);
   };
 
   render() {

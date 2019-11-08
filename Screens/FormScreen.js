@@ -92,7 +92,10 @@ class FormView extends React.Component {
     let {inputs} = this.state;
     if (formType === 'employee') {
       if (status === 'new') {
-        data = (await performMutation(this, AddEmployee, inputs)) || data;
+        data = await performMutation(this, AddEmployee, inputs);
+        if (data) {
+          data = inputs;
+        }
       } else if (status === 'edit') {
         data =
           (await performMutation(this, EditEmployee, {
